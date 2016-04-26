@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cleverbot.io": "^1.0.4",
     "mitsuku-api": "^0.1.1"
   }
 }
