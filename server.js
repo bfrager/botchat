@@ -5,85 +5,58 @@ var Promise = require('bluebird'),
 var cBot1 = proxyCleverbot({cleverbot: new cleverbot("XzFXgz8tNKnKEXWr", "8YDDSbvOQQS2OXlQXIt7D7XgnB1Gvfiv"), tag: "cb1"});
     cBot2 = proxyCleverbot({cleverbot: new cleverbot("joxeAvdfp88eqpVw", "WjroMMdxE1xEGJjVdeBgB2av68OWDK2b"), tag: "cb2"});
 
+// instantiate cleverbots
 cBot1.setNick("Test Session 1");
-cBot2.setNick("Test Session 2");
-
 cBot1.create(function (err, session) {
-
 });
 
+cBot2.setNick("Test Session 2");
 cBot2.create(function (err, session) {
-
 });
 
-var mBot1 = mFactory({tag: 'Mitsuku'}),
-    mBot2 = mFactory({tag: 'Mitsushi'});
+// instantiate mitsuku bots
+var mBot1 = mFactory({tag: 'mBot1'}),
+    mBot2 = mFactory({tag: 'mBot2'});
 
-// cBot.setNick("testSession");
-//
-// cBot.create(function (err, session) {
-  // cBot.ask("Just a small town girl", function (err, response) {
-  //   console.log(response); // Will likely be: "Living in a lonely world"
-  // });
-// });
-//
+// start bot2bot conversations based on random conversation starters array
+loopConvo(mBot1, mBot2, null, greet());
 
-// loopConvo(mBot1, mBot2, null, greet());
-
-// loopConvo(cBot1, cBot2, null, greet());
+loopConvo(cBot1, cBot2, null, greet());
 
 loopConvo(mBot1, cBot2, null, greet());
 
-
+// recursive conversation turns
 function loopConvo(sender, receiver, prevMessage, nextMessage) {
     var prev = prevMessage || nextMessage;
     console.log(receiver + ": " + nextMessage);
     return new Promise(function (resolve, reject) {
         // say.speak(sender.getTag(), nextMessage, function () {
-          // if (sender._tag) {
-            // console.log("sending to mitsuku server");
             resolve(sender.send(nextMessage)
                 .then(function (response) {
+                    // add garbage string input to avoid endless repetition
                     var repeated = flatten(response) == flatten(nextMessage),
                         next = response;
                     if (repeated) {
                         next = reverse(next);
                     }
-                    console.log("prev =", prev);
-                    console.log("next =", response);
+                    // console.log("prev =", prev);
+                    // console.log("next =", response);
                     prev = nextMessage; // added for cleverbot
                     return loopConvo(receiver, sender, prev, next);
                 }));
-          // }
-          // if (sender.user) {
-          //   console.log("sending to cleverbot server");
-          //   resolve(sender.ask(nextMessage, function (err, response) {
-          //     // var repeated = flatten(response) == flatten(nextMessage),
-          //     //     next = response;
-          //     // if (repeated) {
-          //     //     next = reverse(next);
-          //     // }
-          //     return loopConvo(receiver, sender, prev, response);
-          //   }));
-          //       // .then(function (response) {
-          //       //
-          //       // }));
-          // }
         // });
     });
 }
 
+// translate cleverbot api to mitsuku interface
 function proxyCleverbot(options) {
     options = options || {};
     var cleverbot = options.cleverbot,
         tag = options.tag || 'Anonymous';
     return {
         send: function(message) {
-            console.log('message =', message);
             return new Promise(function (resolve, reject) {
                 cleverbot.ask(message, function (err, response) {
-                    console.log('response =', response);
-                    console.log('err =', err);
                     var message = response.message || '';
                     resolve(response);
                 });
@@ -106,9 +79,7 @@ function proxyCleverbot(options) {
     }
 }
 
-/* Generates a random greet
- * @return The greet
- */
+// generate a random conversation starter
 function greet() {
     var greets = [
       "What is the meaning of life?",
@@ -136,6 +107,7 @@ function greet() {
     return greets[Math.floor(Math.random() * greets.length)];
 }
 
+// functions to avoid infinite repetition loops
 function flatten(s) {
     return s.replace(/[^a-zA-Z\d]/g, '').toLowerCase();
 }
