@@ -1,9 +1,11 @@
 var Promise = require('bluebird'),
     mFactory = require('mitsuku-api'),
-    cleverbot = require("cleverbot.io");
+    cleverbot = require('cleverbot.io'),
+    rFactory = require('./app/public/rose.js');
 
 var cBot1 = proxyCleverbot({cleverbot: new cleverbot("XzFXgz8tNKnKEXWr", "8YDDSbvOQQS2OXlQXIt7D7XgnB1Gvfiv"), tag: "cb1"});
     cBot2 = proxyCleverbot({cleverbot: new cleverbot("joxeAvdfp88eqpVw", "WjroMMdxE1xEGJjVdeBgB2av68OWDK2b"), tag: "cb2"});
+    cBot3 = proxyCleverbot({cleverbot: new cleverbot("joxeAvdfp88eqpVw", "WjroMMdxE1xEGJjVdeBgB2av68OWDK2b"), tag: "cb3"});
 
 // instantiate cleverbots
 cBot1.setNick("Test Session 1");
@@ -14,16 +16,28 @@ cBot2.setNick("Test Session 2");
 cBot2.create(function (err, session) {
 });
 
+cBot3.setNick("Test Session 3");
+cBot3.create(function (err, session) {
+});
+
 // instantiate mitsuku bots
 var mBot1 = mFactory({tag: 'mBot1'}),
-    mBot2 = mFactory({tag: 'mBot2'});
+    mBot2 = mFactory({tag: 'mBot2'}),
+    mBot3 = mFactory({tag: 'mBot3'});
+
+// instantiate rose bots
+var rBot1 = rFactory({tag: 'rBot1'}),
+    rBot2 = rFactory({tag: 'rBot2'}),
+    rBot3 = rFactory({tag: 'rBot3'});
 
 // start bot2bot conversations based on random conversation starters array
-loopConvo(mBot1, mBot2, null, greet());
+// loopConvo(mBot1, mBot2, null, greet());
+//
+// loopConvo(cBot1, cBot2, null, greet());
+//
+// loopConvo(mBot3, cBot3, null, greet());
 
-loopConvo(cBot1, cBot2, null, greet());
-
-loopConvo(mBot1, cBot2, null, greet());
+loopConvo(rBot1, rBot2, null, greet());
 
 // recursive conversation turns
 function loopConvo(sender, receiver, prevMessage, nextMessage) {
@@ -33,7 +47,7 @@ function loopConvo(sender, receiver, prevMessage, nextMessage) {
         // say.speak(sender.getTag(), nextMessage, function () {
             resolve(sender.send(nextMessage)
                 .then(function (response) {
-                    // add garbage string input to avoid endless repetition
+                    // add garbage string input on repeated messages to avoid endless repetition
                     var repeated = flatten(response) == flatten(nextMessage),
                         next = response;
                     if (repeated) {
