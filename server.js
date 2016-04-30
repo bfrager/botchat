@@ -31,13 +31,13 @@ var rBot1 = rFactory({tag: 'rBot1'}),
     rBot3 = rFactory({tag: 'rBot3'});
 
 // start bot2bot conversations based on random conversation starters array
-// loopConvo(mBot1, mBot2, null, greet());
+loopConvo(mBot1, mBot2, null, greet());
 //
 // loopConvo(cBot1, cBot2, null, greet());
 //
 // loopConvo(mBot3, cBot3, null, greet());
 
-loopConvo(rBot1, rBot2, null, greet());
+// loopConvo(rBot1, rBot2, null, greet());
 
 // recursive conversation turns
 function loopConvo(sender, receiver, prevMessage, nextMessage) {
@@ -51,7 +51,7 @@ function loopConvo(sender, receiver, prevMessage, nextMessage) {
                     var repeated = flatten(response) == flatten(nextMessage),
                         next = response;
                     if (repeated) {
-                        next = reverse(next);
+                        next = greet();
                     }
                     // console.log("prev =", prev);
                     // console.log("next =", response);
